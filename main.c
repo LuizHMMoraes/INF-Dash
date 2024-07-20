@@ -1,38 +1,23 @@
 #include "raylib.h"
-
-typedef struct Obstacle {
-    int x;
-    int y;
-    int width;
-    int height;
-    int speed;
-} Obstacle;
-
-typedef struct Quadrado {
-    int x;
-    int y;
-    int lado;
-    int velocidade;
-    int velocidadeVertical;
-    bool pulando;
-} Quadrado;
+#include "Obstacle.h"
+#include "Quadrado.h"
 
 #define NUM_OBSTACLES 10
 
 int main(void) {
-    const int Larguratela = 800; // screenwidth
-    const int Alturatela = 450;  // screenheight
-    
-    InitWindow(Larguratela, Alturatela, "Rapper Slide");
-    
+    const int LARGURA_TELA = 800; // screenwidth
+    const int ALTURA_TELA = 450;  // screenheight
+
+    InitWindow(LARGURA_TELA, ALTURA_TELA, "Rapper Slide");
+
     SetTargetFPS(60);
-    
+
     // Inicializa o quadrado
-    Quadrado quadrado = { 0, Alturatela - 50, 50, 2, 0, false };
-    
+    Quadrado quadrado = { 0, ALTURA_TELA - 50, 50, 2, 0, false };
+
     // Carrega textura de fundo
     Texture2D backgroundTexture = LoadTexture("fundo.png");
-    
+
     // Variáveis para o pulo
     int velocidadedopulo = -15;
     int gravidade = 1;
@@ -42,8 +27,8 @@ int main(void) {
     for (int i = 0; i < NUM_OBSTACLES; i++) {
         obstacles[i].width = 20;
         obstacles[i].height = 40;
-        obstacles[i].x = Larguratela + i * 100; // espaçamento inicial entre os obstáculos
-        obstacles[i].y = Alturatela - obstacles[i].height;
+        obstacles[i].x = LARGURA_TELA + i * 100; // espaçamento inicial entre os obstáculos
+        obstacles[i].y = ALTURA_TELA - obstacles[i].height;
         obstacles[i].speed = 4;
     }
 
@@ -51,9 +36,9 @@ int main(void) {
     while (!WindowShouldClose()) {
         // Atualiza a posição do quadrado no eixo X
         quadrado.x += quadrado.velocidade;
-       
+
         // Se o quadrado sair da tela, retorna ao início
-        if (quadrado.x > Larguratela) {
+        if (quadrado.x > LARGURA_TELA) {
             quadrado.x = -quadrado.lado;
         }
 
@@ -63,8 +48,8 @@ int main(void) {
             quadrado.y += quadrado.velocidadeVertical; // Atualiza a posição Y do quadrado
 
             // Verifica se o quadrado aterrissou no chão
-            if (quadrado.y >= Alturatela - quadrado.lado) {
-                quadrado.y = Alturatela - quadrado.lado; // Mantém o quadrado no chão
+            if (quadrado.y >= ALTURA_TELA - quadrado.lado) {
+                quadrado.y = ALTURA_TELA - quadrado.lado; // Mantém o quadrado no chão
                 quadrado.pulando = false; // Termina o pulo
                 quadrado.velocidadeVertical = 0; // Reseta a velocidade vertical
             }
@@ -82,19 +67,19 @@ int main(void) {
 
             // Se o obstáculo sair da tela, reposiciona-o à direita
             if (obstacles[i].x < -obstacles[i].width) {
-                obstacles[i].x = Larguratela;
+                obstacles[i].x = LARGURA_TELA;
             }
 
             // Detecta colisão com o quadrado
-            if (CheckCollisionRecs((Rectangle){quadrado.x, quadrado.y, quadrado.lado, quadrado.lado}, 
+            if (CheckCollisionRecs((Rectangle){quadrado.x, quadrado.y, quadrado.lado, quadrado.lado},
                                    (Rectangle){obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height})) {
                 // Se colidir, resetar o jogo (ou qualquer outra lógica de colisão)
                 quadrado.x = 0;
-                quadrado.y = Alturatela - quadrado.lado;
+                quadrado.y = ALTURA_TELA - quadrado.lado;
                 quadrado.pulando = false;
                 quadrado.velocidadeVertical = 0;
                 for (int j = 0; j < NUM_OBSTACLES; j++) {
-                    obstacles[j].x = Larguratela + j * 200;
+                    obstacles[j].x = LARGURA_TELA + j * 200;
                 }
             }
         }
@@ -117,10 +102,10 @@ int main(void) {
         // Termina o desenho
         EndDrawing();
     }
-    
+
     // Fecha a janela e limpa os recursos
     UnloadTexture(backgroundTexture);
     CloseWindow();
-    
+
     return 0;
 }
