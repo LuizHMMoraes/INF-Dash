@@ -1,111 +1,165 @@
 #include "raylib.h"
+#include "Mouse.h"
 #include "Obstacle.h"
-#include "Quadrado.h"
+#include "Square.h"
 
 #define NUM_OBSTACLES 10
+//------------------------------------------------------------------------------------------
+// Types and Structures Definition
+//------------------------------------------------------------------------------------------
+typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, ENDING } GameScreen;
 
-int main(void) {
-    const int LARGURA_TELA = 800; // screenwidth
-    const int ALTURA_TELA = 450;  // screenheight
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
+int main(void)
+{
+    // Initialization
+    //--------------------------------------------------------------------------------------
+    const int SCREEN_WIDTH = 1200;
+    const int SCREEN_HEIGHT = 600;
 
-    InitWindow(LARGURA_TELA, ALTURA_TELA, "Rapper Slide");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib INF-Dash project");
 
-    SetTargetFPS(60);
+    Image titleImage = LoadImage("tiles/inf-dash.png");
+    Texture2D backgroundTitleImage = LoadTextureFromImage(titleImage);
+    GameScreen currentScreen = LOGO;
 
-    // Inicializa o quadrado
-    Quadrado quadrado = { 0, ALTURA_TELA - 50, 50, 2, 0, false };
+    // Initialize buttons positions
+    int buttonX = 525;
+    int buttonY = 300;
+    int buttonSpacing = 60;
 
-    // Carrega textura de fundo
-    Texture2D backgroundTexture = LoadTexture("fundo.png");
+    // Initialize buttons
+    const char *playText = "PLAY";
+    const char *leaderboardText = "LEADERBOARD";
+    const char *quitText = "QUIT";
 
-    // Variáveis para o pulo
-    int velocidadedopulo = -15;
-    int gravidade = 1;
+    int framesCounter = 0; // Useful to count frames
 
-    // Obstáculos
-    Obstacle obstacles[NUM_OBSTACLES];
-    for (int i = 0; i < NUM_OBSTACLES; i++) {
-        obstacles[i].width = 20;
-        obstacles[i].height = 40;
-        obstacles[i].x = LARGURA_TELA + i * 100; // espaçamento inicial entre os obstáculos
-        obstacles[i].y = ALTURA_TELA - obstacles[i].height;
-        obstacles[i].speed = 4;
-    }
+    SetTargetFPS(60); // Set desired framerate (frames-per-second)
+    //--------------------------------------------------------------------------------------
 
-    // Loop principal do jogo
-    while (!WindowShouldClose()) {
-        // Atualiza a posição do quadrado no eixo X
-        quadrado.x += quadrado.velocidade;
+    // Main game loop
+    while (!WindowShouldClose()) // Detect window close button or ESC key
+    {
+        // Update
+        //----------------------------------------------------------------------------------
+        switch (currentScreen)
+        {
+            case LOGO:
+            {
+                framesCounter++; // Count frames
 
-        // Se o quadrado sair da tela, retorna ao início
-        if (quadrado.x > LARGURA_TELA) {
-            quadrado.x = -quadrado.lado;
-        }
-
-        // Mecânica de pulo
-        if (quadrado.pulando) {
-            quadrado.velocidadeVertical += gravidade; // Aplica a gravidade
-            quadrado.y += quadrado.velocidadeVertical; // Atualiza a posição Y do quadrado
-
-            // Verifica se o quadrado aterrissou no chão
-            if (quadrado.y >= ALTURA_TELA - quadrado.lado) {
-                quadrado.y = ALTURA_TELA - quadrado.lado; // Mantém o quadrado no chão
-                quadrado.pulando = false; // Termina o pulo
-                quadrado.velocidadeVertical = 0; // Reseta a velocidade vertical
-            }
-        } else {
-            // Inicia o pulo se a tecla espaço for pressionada
-            if (IsKeyPressed(KEY_SPACE)) {
-                quadrado.pulando = true;
-                quadrado.velocidadeVertical = velocidadedopulo;
-            }
-        }
-
-        // Atualiza a posição dos obstáculos
-        for (int i = 0; i < NUM_OBSTACLES; i++) {
-            obstacles[i].x -= obstacles[i].speed;
-
-            // Se o obstáculo sair da tela, reposiciona-o à direita
-            if (obstacles[i].x < -obstacles[i].width) {
-                obstacles[i].x = LARGURA_TELA;
-            }
-
-            // Detecta colisão com o quadrado
-            if (CheckCollisionRecs((Rectangle){quadrado.x, quadrado.y, quadrado.lado, quadrado.lado},
-                                   (Rectangle){obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height})) {
-                // Se colidir, resetar o jogo (ou qualquer outra lógica de colisão)
-                quadrado.x = 0;
-                quadrado.y = ALTURA_TELA - quadrado.lado;
-                quadrado.pulando = false;
-                quadrado.velocidadeVertical = 0;
-                for (int j = 0; j < NUM_OBSTACLES; j++) {
-                    obstacles[j].x = LARGURA_TELA + j * 200;
+                // Wait for 3 seconds (180 frames) before jumping to TITLE screen
+                if (framesCounter > 180)
+                {
+                    currentScreen = TITLE;
                 }
             }
-        }
+            break;
 
-        // Inicia o desenho
+            case TITLE:
+            {
+                // Handle button clicks
+                if (IsButtonClicked(playText, buttonX, buttonY))
+                {
+                    currentScreen = GAMEPLAY;
+                }
+                if (IsButtonClicked(leaderboardText, buttonX, buttonY + buttonSpacing))
+                {
+                    // Handle leaderboard action
+                }
+                if (IsButtonClicked(quitText, buttonX, buttonY + 2 * buttonSpacing))
+                {
+                    CloseWindow();
+                    return 0;
+                }
+            }
+            break;
+
+            case GAMEPLAY:
+            {
+                // Press enter to change to ENDING screen
+                if (IsKeyPressed(KEY_ENTER))
+                {
+                    currentScreen = ENDING;
+                }
+            }
+            break;
+
+            case ENDING:
+            {
+                // Press enter to return to TITLE screen
+                if (IsKeyPressed(KEY_ENTER))
+                {
+                    currentScreen = TITLE;
+                }
+            }
+            break;
+
+            default:
+                break;
+        }
+        //----------------------------------------------------------------------------------
+
+        // Draw
+        //----------------------------------------------------------------------------------
         BeginDrawing();
+
         ClearBackground(RAYWHITE);
-        DrawTexture(backgroundTexture, 0, 0, WHITE);
 
-        DrawText("ABRINDO A PRIMEIRA JANELA NA RAÇA", 190, 200, 20, LIGHTGRAY);
+        switch (currentScreen)
+        {
+            case LOGO:
+            {
+                DrawText("UFRGS - Algoritmos e Programação", 20, 20, 40, LIGHTGRAY);
+                DrawText("Turma D", 20, 70, 20, LIGHTGRAY);
+                DrawText("Luiz H. M. Moraes", 450, 220, 30, GRAY);
+                DrawText("Nathan S. Pacheco", 450, 260, 30, GRAY);
+            }
+            break;
 
-        // Desenha o quadrado
-        DrawRectangle(quadrado.x, quadrado.y, quadrado.lado, quadrado.lado, BLUE);
+            case TITLE:
+            {
+                ClearBackground(BLUE);
+                DrawTexture(backgroundTitleImage, 200, 80, WHITE);
+                DrawButton(playText, buttonX, buttonY);
+                DrawButton(leaderboardText, buttonX, buttonY + buttonSpacing);
+                DrawButton(quitText, buttonX, buttonY + 2 * buttonSpacing);
+            }
+            break;
 
-        // Desenha os obstáculos
-        for (int i = 0; i < NUM_OBSTACLES; i++) {
-            DrawRectangle(obstacles[i].x, obstacles[i].y, obstacles[i].width, obstacles[i].height, RED);
+            case GAMEPLAY:
+            {
+                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, PURPLE);
+                DrawText("GAMEPLAY SCREEN", 20, 20, 40, MAROON);
+                DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
+            }
+            break;
+
+            case ENDING:
+            {
+                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLUE);
+                DrawText("ENDING SCREEN", 20, 20, 40, DARKBLUE);
+                DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 120, 220, 20, DARKBLUE);
+            }
+            break;
+
+            default:
+                break;
         }
 
-        // Termina o desenho
         EndDrawing();
+        //----------------------------------------------------------------------------------
     }
 
-    // Fecha a janela e limpa os recursos
-    UnloadTexture(backgroundTexture);
-    CloseWindow();
+    // De-Initialization
+    //--------------------------------------------------------------------------------------
+
+    UnloadTexture(backgroundTitleImage); // Unload background texture
+    CloseWindow(); // Close window and OpenGL context
+    //--------------------------------------------------------------------------------------
 
     return 0;
 }
