@@ -21,7 +21,7 @@ int main(void)
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib INF-Dash project");
 
-    Image titleImage = LoadImage("tiles/inf-dash.png");
+    Image titleImage = LoadImage("INF-Dash/tiles/inf-dash.png");
     Texture2D backgroundTitleImage = LoadTextureFromImage(titleImage);
     GameScreen currentScreen = LOGO;
 
