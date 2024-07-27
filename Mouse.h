@@ -9,4 +9,4 @@ bool IsButtonClicked(const char *text, int x, int y);
 // Function to draw a button with hover effect
 void DrawButton(const char *text, int x, int y);
 
-#endif // MOUSE_H
+#endif  //MOUSE_H

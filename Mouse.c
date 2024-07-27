@@ -1,3 +1,4 @@
+#include "raylib.h"
 #include "Mouse.h"
 //the name of this file should be 'MouseHandler'
 bool IsButtonClicked(const char *text, int x, int y)

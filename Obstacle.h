@@ -1,12 +1,11 @@
-#ifndef OBSTACLE_H_INCLUDED
-#define OBSTACLE_H_INCLUDED
+#ifndef OBSTACLE_H
+#define OBSTACLE_H
+#include "raylib.h"
 
 typedef struct Obstacle {
-    int x;
-    int y;
-    int width;
-    int height;
-    int speed;
+    Vector2 position;
+    Vector2 size;
+    float speed;
 } Obstacle;
 
-#endif // OBSTACLE_H_INCLUDED
+#endif // OBSTACLE_H
