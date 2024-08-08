@@ -1,0 +1,5 @@
+MARLEY 20000
+salo 2000
+edigle 200
+Bob 75
+Carol 60
