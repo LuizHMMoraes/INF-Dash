@@ -1,9 +1,10 @@
-######################
-#...................O#
-#..........O.........#
-#....................#
-######.......O.....###
-#....................#
-#................O...#
-#......O.............#
-######################
+
+
+
+
+                     O                     O
+
+                 B BB   BBBB   BBB BB   B BB
+     P      BBB     BBBBB  BB   BB   B  BB
+BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB            BBBBBBBBBBBBBBBBBBBBBBBBB
+

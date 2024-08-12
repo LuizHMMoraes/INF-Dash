@@ -1,45 +1,62 @@
 #include "raylib.h"
-#include "game.h"
-#include "menu.h"
-//#include "level_loader.h"
-//#include <stdlib.h>
 #include "Mouse.h"
-//#include <stdio.h>
+#include "Gameplay.h"
 
 
+//------------------------------------------------------------------------------------------
+// Types and Structures Definition
+//------------------------------------------------------------------------------------------
 typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, ENDING } GameScreen;
 
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
 int main(void)
 {
-    // Inicializacao
-    const int SCREEN_WIDTH = 800;
-    const int SCREEN_HEIGHT = 450;
+    // Initialization
+    //--------------------------------------------------------------------------------------
+    const int SCREEN_WIDTH = 1200;
+    const int SCREEN_HEIGHT = 600;
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib INF-Dash project");
 
-    Image titleImage = LoadImage("INFDash/tiles/inf-dash.png");
+    //carrega as texturas menu
+    Image titleImage = LoadImage("tiles/inf-dash.png");
     Texture2D backgroundTitleImage = LoadTextureFromImage(titleImage);
-   
 
+    //define a tela inicial do jogo
     GameScreen currentScreen = LOGO;
-    int framesCounter = 0; // Útil para contar frames
+
+    // Initialize buttons positions
+    int buttonX = 525;
+    int buttonY = 300;
+    int buttonSpacing = 60;
+
+    // Initialize buttons
+    const char *playText = "PLAY";
+    const char *leaderboardText = "LEADERBOARD";
+    const char *quitText = "QUIT";
+
+    int framesCounter = 0; // Useful to count frames
 
     // Inicializa o estado do jogo
     GameState gameState = InitGame();
 
-    SetTargetFPS(60); // Define a taxa de quadros por segundo
+    SetTargetFPS(60); // Set desired framerate (frames-per-second)
+    //--------------------------------------------------------------------------------------
 
-    // Loop principal do jogo
-    while (!WindowShouldClose()) // Detecta se a janela deve fechar
+    // Main game loop
+    while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        // Atualiza
+        // Update
+        //----------------------------------------------------------------------------------
         switch (currentScreen)
         {
             case LOGO:
             {
-                framesCounter++; // Conta frames
+                framesCounter++; // Count frames
 
-                // Espera por 3 segundos (180 frames) antes de pular para a tela TITLE
+                // Wait for 3 seconds (180 frames) before jumping to TITLE screen
                 if (framesCounter > 180)
                 {
                     currentScreen = TITLE;
@@ -49,16 +66,16 @@ int main(void)
 
             case TITLE:
             {
-                // Lida com cliques nos botões
-                if (IsButtonClicked("PLAY", 525, 300))
+                // Handle button clicks
+                if (IsButtonClicked(playText, buttonX, buttonY))
                 {
                     currentScreen = GAMEPLAY;
                 }
-                if (IsButtonClicked("LEADERBOARD", 525, 360))
+                if (IsButtonClicked(leaderboardText, buttonX, buttonY + buttonSpacing))
                 {
-                    // Lógica do leaderboard
+                    // Handle leaderboard action
                 }
-                if (IsButtonClicked("QUIT", 525, 420))
+                if (IsButtonClicked(quitText, buttonX, buttonY + 2 * buttonSpacing))
                 {
                     CloseWindow();
                     return 0;
@@ -71,7 +88,7 @@ int main(void)
                 // Atualiza o estado do jogo
                 UpdateGame(&gameState);
 
-                // Pressiona enter para mudar para a tela ENDING
+                // Press enter to change to ENDING screen
                 if (IsKeyPressed(KEY_ENTER))
                 {
                     currentScreen = ENDING;
@@ -81,7 +98,8 @@ int main(void)
 
             case ENDING:
             {
-                // Pressiona enter para retornar para a tela TITLE
+                gameState = InitGame();
+                // Press enter to return to TITLE screen
                 if (IsKeyPressed(KEY_ENTER))
                 {
                     currentScreen = TITLE;
@@ -92,9 +110,12 @@ int main(void)
             default:
                 break;
         }
+        //----------------------------------------------------------------------------------
 
-        // Desenha
+        // Draw
+        //----------------------------------------------------------------------------------
         BeginDrawing();
+
         ClearBackground(RAYWHITE);
 
         switch (currentScreen)
@@ -112,16 +133,16 @@ int main(void)
             {
                 ClearBackground(BLUE);
                 DrawTexture(backgroundTitleImage, 200, 80, WHITE);
-                DrawButton("PLAY", 525, 300);
-                DrawButton("LEADERBOARD", 525, 360);
-                DrawButton("QUIT", 525, 420);
+                DrawButton(playText, buttonX, buttonY);
+                DrawButton(leaderboardText, buttonX, buttonY + buttonSpacing);
+                DrawButton(quitText, buttonX, buttonY + 2 * buttonSpacing);
             }
             break;
 
             case GAMEPLAY:
             {
                 DrawGame(&gameState);
-                DrawText("PRESS ENTER to END GAME", 20, 20, 20, MAROON);
+                DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
             }
             break;
 
@@ -129,7 +150,7 @@ int main(void)
             {
                 DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLUE);
                 DrawText("ENDING SCREEN", 20, 20, 40, DARKBLUE);
-                DrawText("PRESS ENTER to RETURN to TITLE", 120, 220, 20, DARKBLUE);
+                DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 120, 220, 20, DARKBLUE);
             }
             break;
 
@@ -138,12 +159,15 @@ int main(void)
         }
 
         EndDrawing();
+        //----------------------------------------------------------------------------------
     }
 
-    // Desinicialização
-    UnloadImage(titleImage); // Descarrega a imagem da memória
-    UnloadTexture(backgroundTitleImage); // Descarrega a textura do título
-    CloseWindow(); // Fecha a janela e o contexto OpenGL
+    // De-Initialization
+    //--------------------------------------------------------------------------------------
+
+    UnloadTexture(backgroundTitleImage); // Unload background texture
+    CloseWindow(); // Close window and OpenGL context
+    //--------------------------------------------------------------------------------------
 
     return 0;
 }
