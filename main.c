@@ -7,7 +7,7 @@
 //------------------------------------------------------------------------------------------
 // Types and Structures Definition
 //------------------------------------------------------------------------------------------
-typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, ENDING } GameScreen;
+typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, ENDING,LEADERBOARDING } GameScreen;
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -69,6 +69,7 @@ int main(void)
                 if (IsButtonClicked(leaderboardText, buttonX, buttonY + buttonSpacing))
                 {
                     // Handle leaderboard action
+                    //TODO CHAMAADA TOP5 DO ARQ TXT
                 }
                 if (IsButtonClicked(quitText, buttonX, buttonY + 2 * buttonSpacing))
                 {
