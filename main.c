@@ -1,13 +1,27 @@
 #include "raylib.h"
 #include "Mouse.h"
-#include "Obstacle.h"
-#include "Square.h"
+#include "Gameplay.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-#define NUM_OBSTACLES 10
+#define MAX_LEADERBOARD_ENTRIES 5
+
 //------------------------------------------------------------------------------------------
 // Types and Structures Definition
 //------------------------------------------------------------------------------------------
-typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, ENDING } GameScreen;
+typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, LEADERBOARD, ENDING } GameScreen;
+
+typedef struct {
+    char name[20];
+    int score;
+} LeaderboardEntry;
+
+//------------------------------------------------------------------------------------
+// Function Declarations
+//------------------------------------------------------------------------------------
+void DrawLeaderboard(LeaderboardEntry leaderboard[], int numEntries);
+void LoadLeaderboard(LeaderboardEntry leaderboard[], int *numEntries);
+void SaveLeaderboard(LeaderboardEntry leaderboard[], int numEntries);
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -21,8 +35,11 @@ int main(void)
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib INF-Dash project");
 
-    Image titleImage = LoadImage("INF-Dash/tiles/inf-dash.png");
+    // Carrega as texturas do menu
+    Image titleImage = LoadImage("tiles/inf-dash.png");
     Texture2D backgroundTitleImage = LoadTextureFromImage(titleImage);
+
+    // Define a tela inicial do jogo
     GameScreen currentScreen = LOGO;
 
     // Initialize buttons positions
@@ -36,6 +53,15 @@ int main(void)
     const char *quitText = "QUIT";
 
     int framesCounter = 0; // Useful to count frames
+
+    // Inicializa o estado do jogo
+    GameState gameState = InitGame();
+
+    // Leaderboard
+    LeaderboardEntry leaderboard[MAX_LEADERBOARD_ENTRIES];
+    int numEntries = 0;
+
+    LoadLeaderboard(leaderboard, &numEntries);
 
     SetTargetFPS(60); // Set desired framerate (frames-per-second)
     //--------------------------------------------------------------------------------------
@@ -68,7 +94,7 @@ int main(void)
                 }
                 if (IsButtonClicked(leaderboardText, buttonX, buttonY + buttonSpacing))
                 {
-                    // Handle leaderboard action
+                    currentScreen = LEADERBOARD;
                 }
                 if (IsButtonClicked(quitText, buttonX, buttonY + 2 * buttonSpacing))
                 {
@@ -80,6 +106,9 @@ int main(void)
 
             case GAMEPLAY:
             {
+                // Atualiza o estado do jogo
+                UpdateGame(&gameState);
+
                 // Press enter to change to ENDING screen
                 if (IsKeyPressed(KEY_ENTER))
                 {
@@ -88,8 +117,18 @@ int main(void)
             }
             break;
 
+            case LEADERBOARD:
+            {
+                // Draw the leaderboard
+                if (IsKeyPressed(KEY_ENTER)) {
+                    currentScreen = TITLE;
+                }
+            }
+            break;
+
             case ENDING:
             {
+                gameState = InitGame();
                 // Press enter to return to TITLE screen
                 if (IsKeyPressed(KEY_ENTER))
                 {
@@ -132,9 +171,15 @@ int main(void)
 
             case GAMEPLAY:
             {
-                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, PURPLE);
-                DrawText("GAMEPLAY SCREEN", 20, 20, 40, MAROON);
+                DrawGame(&gameState);
                 DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
+            }
+            break;
+
+            case LEADERBOARD:
+            {
+                ClearBackground(RAYWHITE);
+                DrawLeaderboard(leaderboard, numEntries);
             }
             break;
 
@@ -162,4 +207,41 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     return 0;
+}
+
+// Function to draw the leaderboard
+void DrawLeaderboard(LeaderboardEntry leaderboard[], int numEntries) {
+    DrawText("LEADERBOARD", 20, 20, 40, DARKGRAY);
+
+    for (int i = 0; i < numEntries; i++) {
+        char entry[100];
+        sprintf(entry, "%d. %s - %d", i + 1, leaderboard[i].name, leaderboard[i].score);
+        DrawText(entry, 100, 100 + 30 * i, 20, DARKGRAY);
+    }
+
+    DrawText("PRESS ENTER to RETURN", 100, 500, 20, DARKGRAY);
+}
+
+// Function to load the leaderboard from a binary file
+void LoadLeaderboard(LeaderboardEntry leaderboard[], int *numEntries) {
+    FILE *file = fopen("top5.bin", "rb");
+
+    if (file == NULL) {
+        *numEntries = 0;
+        return;
+    }
+
+    *numEntries = fread(leaderboard, sizeof(LeaderboardEntry), MAX_LEADERBOARD_ENTRIES, file);
+
+    fclose(file);
+}
+
+// Function to save the leaderboard to a binary file
+void SaveLeaderboard(LeaderboardEntry leaderboard[], int numEntries) {
+    FILE *file = fopen("top5.bin", "wb");
+
+    if (file != NULL) {
+        fwrite(leaderboard, sizeof(LeaderboardEntry), numEntries, file);
+        fclose(file);
+    }
 }
