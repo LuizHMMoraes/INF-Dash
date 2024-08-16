@@ -1,27 +1,14 @@
 #include "raylib.h"
 #include "Mouse.h"
 #include "Gameplay.h"
+#include "Leaderboard.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-#define MAX_LEADERBOARD_ENTRIES 5
 
 //------------------------------------------------------------------------------------------
 // Types and Structures Definition
 //------------------------------------------------------------------------------------------
 typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, LEADERBOARD, ENDING } GameScreen;
-
-typedef struct {
-    char name[20];
-    int score;
-} LeaderboardEntry;
-
-//------------------------------------------------------------------------------------
-// Function Declarations
-//------------------------------------------------------------------------------------
-void DrawLeaderboard(LeaderboardEntry leaderboard[], int numEntries);
-void LoadLeaderboard(LeaderboardEntry leaderboard[], int *numEntries);
-void SaveLeaderboard(LeaderboardEntry leaderboard[], int numEntries);
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -119,7 +106,8 @@ int main(void)
 
             case LEADERBOARD:
             {
-                // Draw the leaderboard
+                ClearBackground(RAYWHITE);
+                DrawLeaderboard(leaderboard, numEntries);
                 if (IsKeyPressed(KEY_ENTER)) {
                     currentScreen = TITLE;
                 }
@@ -207,41 +195,4 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     return 0;
-}
-
-// Function to draw the leaderboard
-void DrawLeaderboard(LeaderboardEntry leaderboard[], int numEntries) {
-    DrawText("LEADERBOARD", 20, 20, 40, DARKGRAY);
-
-    for (int i = 0; i < numEntries; i++) {
-        char entry[100];
-        sprintf(entry, "%d. %s - %d", i + 1, leaderboard[i].name, leaderboard[i].score);
-        DrawText(entry, 100, 100 + 30 * i, 20, DARKGRAY);
-    }
-
-    DrawText("PRESS ENTER to RETURN", 100, 500, 20, DARKGRAY);
-}
-
-// Function to load the leaderboard from a binary file
-void LoadLeaderboard(LeaderboardEntry leaderboard[], int *numEntries) {
-    FILE *file = fopen("top5.bin", "rb");
-
-    if (file == NULL) {
-        *numEntries = 0;
-        return;
-    }
-
-    *numEntries = fread(leaderboard, sizeof(LeaderboardEntry), MAX_LEADERBOARD_ENTRIES, file);
-
-    fclose(file);
-}
-
-// Function to save the leaderboard to a binary file
-void SaveLeaderboard(LeaderboardEntry leaderboard[], int numEntries) {
-    FILE *file = fopen("top5.bin", "wb");
-
-    if (file != NULL) {
-        fwrite(leaderboard, sizeof(LeaderboardEntry), numEntries, file);
-        fclose(file);
-    }
 }
