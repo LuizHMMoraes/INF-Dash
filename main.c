@@ -1,12 +1,18 @@
 #include "raylib.h"
 #include "Mouse.h"
+<<<<<<< HEAD
 #include "Gameplay.h"
 
+=======
+#include "Leaderboard.h"
+#include <stdio.h>
+#include <stdlib.h>
+>>>>>>> leaderboards
 
 //------------------------------------------------------------------------------------------
 // Types and Structures Definition
 //------------------------------------------------------------------------------------------
-typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, ENDING } GameScreen;
+typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, LEADERBOARD, ENDING } GameScreen;
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -20,6 +26,7 @@ int main(void)
 
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib INF-Dash project");
 
+<<<<<<< HEAD
     //carrega as texturas menu
     Image titleImage = LoadImage("tiles/inf-dash.png");
     Texture2D titleTexture = LoadTextureFromImage(titleImage);
@@ -42,6 +49,13 @@ int main(void)
     Texture2D playerTexture = LoadTextureFromImage(playerImage);
 
     //define a tela inicial do jogo
+=======
+    // Carrega as texturas do menu
+    Image titleImage = LoadImage("tiles/inf-dash.png");
+    Texture2D backgroundTitleImage = LoadTextureFromImage(titleImage);
+
+    // Define a tela inicial do jogo
+>>>>>>> leaderboards
     GameScreen currentScreen = LOGO;
 
     // Initialize buttons positions
@@ -49,16 +63,24 @@ int main(void)
     int buttonY = 300;
     int buttonSpacing = 60;
 
-    // Initialize buttons
+    // Inicia botões
     const char *playText = "PLAY";
     const char *leaderboardText = "LEADERBOARD";
     const char *quitText = "QUIT";
 
-    int framesCounter = 0; // Useful to count frames
+    //Inicia Leaderboard
+    LeaderboardEntry leaderboard[MAX_LEADERBOARD_ENTRIES];
+    LoadLeaderboard(leaderboard);
 
+<<<<<<< HEAD
     // Inicializa o estado do jogo
     GameState gameState = InitGame();
 
+=======
+    int framesCounter = 0; // Useful to count frames
+    float waitStartTime = 0.0f;
+    bool isWaiting = false;
+>>>>>>> leaderboards
     SetTargetFPS(60); // Set desired framerate (frames-per-second)
     //--------------------------------------------------------------------------------------
 
@@ -90,7 +112,7 @@ int main(void)
                 }
                 if (IsButtonClicked(leaderboardText, buttonX, buttonY + buttonSpacing))
                 {
-                    // Handle leaderboard action
+                    currentScreen = LEADERBOARD;
                 }
                 if (IsButtonClicked(quitText, buttonX, buttonY + 2 * buttonSpacing))
                 {
@@ -102,24 +124,59 @@ int main(void)
 
             case GAMEPLAY:
             {
+<<<<<<< HEAD
                 // Atualiza o estado do jogo
                 UpdateGame(&gameState);
 
                 // Se as tentativas acabaram, muda para a tela de ENDING
                 if (gameState.player.attempts == 0)
+=======
+
+                if (IsKeyPressed(KEY_ENTER))
+>>>>>>> leaderboards
                 {
                     currentScreen = ENDING;
+                }
+
+            }
+            break;
+
+        case LEADERBOARD:
+            {
+<<<<<<< HEAD
+                gameState = InitGame();
+                // Press enter to return to TITLE screen
+=======
+                // Se a tecla ENTER for pressionada, volta para o menu TITLE
+>>>>>>> leaderboards
+                if (IsKeyPressed(KEY_ENTER))
+                {
+                    currentScreen = TITLE;
                 }
             }
             break;
 
-            case ENDING:
+        case ENDING:
             {
-                gameState = InitGame();
-                // Press enter to return to TITLE screen
-                if (IsKeyPressed(KEY_ENTER))
+                if (!isWaiting)
                 {
-                    currentScreen = TITLE;
+                    waitStartTime = GetTime();
+                    isWaiting = true;
+                }
+                else
+                    // Espera 3 segundos
+                    if (GetTime() - waitStartTime >= 3.0f)
+                    {
+                    int score = 2000; // Simulate game score
+
+                        // Verifica se o jogador se qualifica para entrar no leaderboard
+                        if (score >= leaderboard[MAX_LEADERBOARD_ENTRIES - 1].score)
+                        {
+                            LeaderboardEntry player = PlayerEntry(score);
+                            Ranking(leaderboard, player);
+                            SaveLeaderboard(leaderboard);
+                        }
+                        currentScreen = TITLE;
                 }
             }
             break;
@@ -164,15 +221,26 @@ int main(void)
 
             case GAMEPLAY:
             {
+<<<<<<< HEAD
                 DrawGame(&gameState, backgroundGameplayTexture, playerTexture, blockTexture, obstacleTexture);
+=======
+                DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 130, 220, 20, MAROON);
+            }
+            break;
+
+            case LEADERBOARD:
+            {
+                ClearBackground(RAYWHITE);
+                DrawLeaderboard(leaderboard);
+>>>>>>> leaderboards
             }
             break;
 
             case ENDING:
             {
-                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLUE);
+                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, WHITE);
                 DrawText("ENDING SCREEN", 20, 20, 40, DARKBLUE);
-                DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 120, 220, 20, DARKBLUE);
+                DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 120, 220, 20, LIGHTGRAY);
             }
             break;
 
