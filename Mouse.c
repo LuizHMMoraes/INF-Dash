@@ -1,4 +1,3 @@
-#include "raylib.h"
 #include "Mouse.h"
 //the name of this file should be 'MouseHandler'
 bool IsButtonClicked(const char *text, int x, int y)
@@ -25,6 +24,6 @@ void DrawButton(const char *text, int x, int y)
     }
     else
     {
-        DrawText(text, x, y, 30, BLACK);
+        DrawText(text, x, y, 30, LIGHTGRAY);
     }
 }

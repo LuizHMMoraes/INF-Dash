@@ -22,13 +22,30 @@ int main(void)
 
     //carrega as texturas menu
     Image titleImage = LoadImage("tiles/inf-dash.png");
-    Texture2D backgroundTitleImage = LoadTextureFromImage(titleImage);
+    Texture2D titleTexture = LoadTextureFromImage(titleImage);
+
+    Image backgroundTitleImage = LoadImage("tiles/fundoTitle.png");
+    Texture2D backgroundTitleTexture = LoadTextureFromImage(backgroundTitleImage);
+
+    //carrega as texturas do cenário
+    Image gameplayImage = LoadImage("tiles/fundoCeu.png");
+    Texture2D backgroundGameplayTexture = LoadTextureFromImage(gameplayImage);
+
+    Image blockImage = LoadImage("tiles/block.png");
+    Texture2D blockTexture = LoadTextureFromImage(blockImage);
+
+    Image obstacleImage = LoadImage("tiles/obstacle.png");
+    Texture2D obstacleTexture = LoadTextureFromImage(obstacleImage);
+
+    //Carrega a textura do jogador
+    Image playerImage = LoadImage("tiles/player.png");
+    Texture2D playerTexture = LoadTextureFromImage(playerImage);
 
     //define a tela inicial do jogo
     GameScreen currentScreen = LOGO;
 
     // Initialize buttons positions
-    int buttonX = 525;
+    int buttonX = 510;
     int buttonY = 300;
     int buttonSpacing = 60;
 
@@ -88,8 +105,8 @@ int main(void)
                 // Atualiza o estado do jogo
                 UpdateGame(&gameState);
 
-                // Press enter to change to ENDING screen
-                if (IsKeyPressed(KEY_ENTER))
+                // Se as tentativas acabaram, muda para a tela de ENDING
+                if (gameState.player.attempts == 0)
                 {
                     currentScreen = ENDING;
                 }
@@ -131,8 +148,14 @@ int main(void)
 
             case TITLE:
             {
-                ClearBackground(BLUE);
-                DrawTexture(backgroundTitleImage, 200, 80, WHITE);
+                ClearBackground(BLACK);
+                //Gambiarra no background
+                DrawTexture(backgroundTitleTexture, 0, 0, WHITE);
+                DrawTexture(backgroundTitleTexture, 600, 0, WHITE);
+                DrawTexture(backgroundTitleTexture, 0, 540, WHITE);
+                DrawTexture(backgroundTitleTexture, 600, 540, WHITE);
+
+                DrawTexture(titleTexture, 200, 80, WHITE);
                 DrawButton(playText, buttonX, buttonY);
                 DrawButton(leaderboardText, buttonX, buttonY + buttonSpacing);
                 DrawButton(quitText, buttonX, buttonY + 2 * buttonSpacing);
@@ -141,8 +164,7 @@ int main(void)
 
             case GAMEPLAY:
             {
-                DrawGame(&gameState);
-                DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
+                DrawGame(&gameState, backgroundGameplayTexture, playerTexture, blockTexture, obstacleTexture);
             }
             break;
 
@@ -165,7 +187,8 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
 
-    UnloadTexture(backgroundTitleImage); // Unload background texture
+    UnloadTexture(titleTexture);
+    UnloadTexture(backgroundTitleTexture); // Unload background texture
     CloseWindow(); // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
