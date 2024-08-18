@@ -5,8 +5,8 @@ bool IsButtonClicked(const char *text, int x, int y)
     int width = MeasureText(text, 30);
     int height = 30;
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) &&
-        GetMouseX() >= x && GetMouseX() <= (x + width) &&
-        GetMouseY() >= y && GetMouseY() <= (y + height))
+            GetMouseX() >= x && GetMouseX() <= (x + width) &&
+            GetMouseY() >= y && GetMouseY() <= (y + height))
     {
         return true;
     }
@@ -18,7 +18,7 @@ void DrawButton(const char *text, int x, int y)
     int width = MeasureText(text, 30);
     int height = 30;
     if (GetMouseX() >= x && GetMouseX() <= (x + width) &&
-        GetMouseY() >= y && GetMouseY() <= (y + height))
+            GetMouseY() >= y && GetMouseY() <= (y + height))
     {
         DrawText(text, x, y, 33, ORANGE);
     }

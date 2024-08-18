@@ -124,8 +124,14 @@ LeaderboardEntry PlayerEntry(int score)
         Vector2 textPosition = { (screenWidth - boxWidth) / 2 + 10, (screenHeight - boxHeight) / 2 + (boxHeight - textSize) / 2 };
         Vector2 boxPosition = { (screenWidth - boxWidth) / 2, (screenHeight - boxHeight) / 2 };
 
-        DrawRectangleV(boxPosition, (Vector2){boxWidth, boxHeight}, LIGHTGRAY);
-        DrawRectangleLinesEx((Rectangle){boxPosition.x, boxPosition.y, boxWidth, boxHeight}, 2, GRAY);
+        DrawRectangleV(boxPosition, (Vector2)
+        {
+            boxWidth, boxHeight
+        }, LIGHTGRAY);
+        DrawRectangleLinesEx((Rectangle)
+        {
+            boxPosition.x, boxPosition.y, boxWidth, boxHeight
+        }, 2, GRAY);
 
         DrawText("Enter your name (press ENTER to finish):", (screenWidth - MeasureText("Enter your name (press ENTER to finish):", textSize)) / 2, boxPosition.y - 40, textSize, DARKGRAY);
         DrawText(nameBuffer, textPosition.x, textPosition.y, textSize, BLACK);

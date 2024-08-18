@@ -7,7 +7,8 @@
 #define MAX_NAME_LENGTH 20
 
 // Estrutura para armazenar uma entrada do leaderboard
-typedef struct {
+typedef struct
+{
     char name[20];
     int score;
 } LeaderboardEntry;

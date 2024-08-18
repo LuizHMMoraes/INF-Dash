@@ -5,7 +5,8 @@
 #define MAX_BLOCKS 3000
 #define MAX_OBSTACLES 300
 
-typedef struct Player {
+typedef struct Player
+{
     Rectangle rect;
     float speed;
     float jumpSpeed;
@@ -17,15 +18,18 @@ typedef struct Player {
     int score;
 } Player;
 
-typedef struct Block {
+typedef struct Block
+{
     Rectangle rect;
 } Block;
 
-typedef struct Obstacle {
+typedef struct Obstacle
+{
     Rectangle rect;
 } Obstacle;
 
-typedef struct GameState {
+typedef struct GameState
+{
     Player player;
     Block blocks[MAX_BLOCKS];
     Obstacle obstacles[MAX_OBSTACLES];
