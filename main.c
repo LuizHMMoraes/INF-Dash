@@ -1,6 +1,5 @@
 #include "raylib.h"
 #include "Mouse.h"
-#include "Gameplay.h"
 #include "Leaderboard.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,22 +33,18 @@ int main(void)
     int buttonY = 300;
     int buttonSpacing = 60;
 
-    // Initialize buttons
+    // Inicia botões
     const char *playText = "PLAY";
     const char *leaderboardText = "LEADERBOARD";
     const char *quitText = "QUIT";
 
-    int framesCounter = 0; // Useful to count frames
-
-    // Inicializa o estado do jogo
-    GameState gameState = InitGame();
-
-    // Leaderboard
+    //Inicia Leaderboard
     LeaderboardEntry leaderboard[MAX_LEADERBOARD_ENTRIES];
-    int numEntries = 0;
+    LoadLeaderboard(leaderboard);
 
-    LoadLeaderboard(leaderboard, &numEntries);
-
+    int framesCounter = 0; // Useful to count frames
+    float waitStartTime = 0.0f;
+    bool isWaiting = false;
     SetTargetFPS(60); // Set desired framerate (frames-per-second)
     //--------------------------------------------------------------------------------------
 
@@ -93,34 +88,46 @@ int main(void)
 
             case GAMEPLAY:
             {
-                // Atualiza o estado do jogo
-                UpdateGame(&gameState);
 
-                // Press enter to change to ENDING screen
                 if (IsKeyPressed(KEY_ENTER))
                 {
                     currentScreen = ENDING;
                 }
+
             }
             break;
 
-            case LEADERBOARD:
+        case LEADERBOARD:
             {
-                ClearBackground(RAYWHITE);
-                DrawLeaderboard(leaderboard, numEntries);
-                if (IsKeyPressed(KEY_ENTER)) {
+                // Se a tecla ENTER for pressionada, volta para o menu TITLE
+                if (IsKeyPressed(KEY_ENTER))
+                {
                     currentScreen = TITLE;
                 }
             }
             break;
 
-            case ENDING:
+        case ENDING:
             {
-                gameState = InitGame();
-                // Press enter to return to TITLE screen
-                if (IsKeyPressed(KEY_ENTER))
+                if (!isWaiting)
                 {
-                    currentScreen = TITLE;
+                    waitStartTime = GetTime();
+                    isWaiting = true;
+                }
+                else
+                    // Espera 3 segundos
+                    if (GetTime() - waitStartTime >= 3.0f)
+                    {
+                    int score = 2000; // Simulate game score
+
+                        // Verifica se o jogador se qualifica para entrar no leaderboard
+                        if (score >= leaderboard[MAX_LEADERBOARD_ENTRIES - 1].score)
+                        {
+                            LeaderboardEntry player = PlayerEntry(score);
+                            Ranking(leaderboard, player);
+                            SaveLeaderboard(leaderboard);
+                        }
+                        currentScreen = TITLE;
                 }
             }
             break;
@@ -159,23 +166,22 @@ int main(void)
 
             case GAMEPLAY:
             {
-                DrawGame(&gameState);
-                DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
+                DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 130, 220, 20, MAROON);
             }
             break;
 
             case LEADERBOARD:
             {
                 ClearBackground(RAYWHITE);
-                DrawLeaderboard(leaderboard, numEntries);
+                DrawLeaderboard(leaderboard);
             }
             break;
 
             case ENDING:
             {
-                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLUE);
+                DrawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, WHITE);
                 DrawText("ENDING SCREEN", 20, 20, 40, DARKBLUE);
-                DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 120, 220, 20, DARKBLUE);
+                DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 120, 220, 20, LIGHTGRAY);
             }
             break;
 
